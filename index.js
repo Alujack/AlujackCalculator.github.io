@@ -1,101 +1,117 @@
-const numbers=document.querySelectorAll('.numbers');
-const result=document.querySelector('.result span');
-const sign=document.querySelectorAll('.sign');
-const equals=document.querySelector('.equals');
-const clearr=document.querySelectorAll('.clear');
-const percent=document.querySelector('.percent');
-const negativenumbers=document.querySelector('.negative');
+const numbers = document.querySelectorAll('.numbers');
+const result = document.querySelector('.result span');
+const signsButtons = document.querySelectorAll('.sign'); // renamed to avoid conflict
+const equals = document.querySelector('.equals');
+const clearButton = document.querySelector('.clear'); // changed to single element
+const percent = document.querySelector('.percent');
+const negativeButton = document.querySelector('.negative');
 
-let firstvalue="";
-let secondvalue="";
-let isfirstvalue=false;
-let issecondvalue=false;
-let signs="";
-let resultvalue=0;
-for(let i = 0; i < numbers.length; i++){
-    numbers[i].addEventListener('click',(e) =>{
+let firstValue = "";
+let secondValue = "";
+let isFirstValue = false;
+let isSecondValue = false;
+let sign = "";
+let resultValue = 0;
+
+// Add event listeners for numbers
+for (let i = 0; i < numbers.length; i++) {
+    numbers[i].addEventListener('click', (e) => {
         let atr = e.target.getAttribute('value');
-        if(isfirstvalue===false){
-            getfirstvalue(atr)
+        if (!isFirstValue) {
+            getFirstValue(atr);
+        } else {
+            getSecondValue(atr);
         }
-        else if(issecondvalue==false){
-            getsecondvalue(atr)
-        }
-    })
-}
-function getfirstvalue(el){
-    result.innerHTML="";
-    firstvalue += el;
-    result.innerHTML = firstvalue;
-    firstvalue = +firstvalue;
+    });
 }
 
-function getsecondvalue(el){
-    if(firstvalue !="" && sign!=""){ 
-    secondvalue += el;
-    result.innerHTML= secondvalue;
-    secondvalue = +secondvalue;
-    } 
+function getFirstValue(el) {
+    result.innerHTML = "";
+    firstValue += el;
+    result.innerHTML = firstValue;
 }
-function getsign(){
-    for(let i=0; i < sign.length ; i++){
-        sign[i].addEventListener('click', (e) =>{
-                signs = e.target.getAttribute('value');
-                isfirstvalue=true;
-        })
-    }
+
+function getSecondValue(el) {
+    result.innerHTML = "";
+    secondValue += el;
+    result.innerHTML = secondValue;
 }
-getsign();
-equals.addEventListener('click' ,()=>{
-    result.innerHTML="";
-    if(signs==="+"){
-        resultvalue= firstvalue +secondvalue;
-    }else if(signs==="-"){
-        resultvalue= firstvalue - secondvalue;
-    }else if(signs==="*"){
-        resultvalue= firstvalue * secondvalue;
-    }else if(signs==="/"){
-        resultvalue= firstvalue /secondvalue;
-    }
-    result.innerHTML= resultvalue;
-    firstvalue = resultvalue;
-    secondvalue="";
-})
-function checkresultlength(){
-    resultvalue= JSON.stringify(resultvalue);
-    if(resultvalue.length >=8){
-        resultvalue=JSON.parse(resultvalue);
-        result.innerHTML= resultvalue.toFixed(5);
+
+// Handle sign clicks
+function getSign() {
+    for (let i = 0; i < signsButtons.length; i++) {
+        signsButtons[i].addEventListener('click', (e) => {
+            sign = e.target.getAttribute('value');
+            isFirstValue = true;
+        });
     }
 }
-percent.addEventListener('click',(e)=>{
-    result.innerHTML="";
-    if(firstvalue!=""){
-        resultvalue= firstvalue/100;
-        firstvalue=resultvalue;
-     } 
-    if(firstvalue!="" && secondvalue!="" && sign!="" ){
-        resultvalue= resultvalue/100;
-       } 
-    result.innerHTML= resultvalue;
-})
-clearr.addEventListener("click" ,()=>{
-    firstvalue="";
-    isfirstvalue=false;
-    secondvalue="";
-    issecondvalue=false;
-    sign="";
-    resultvalue=0;
-    result.innerHTML=0;
-})
-negativenumbers.addEventListener('click' ,()=>{
-    result.innerHTML= "";
-    if(firstvalue!=""){
-     resultvalue= -firstvalue;
-     firstvalue = -resultvalue;
-    } 
-    if(firstvalue!="" && secondvalue!="" && sign!=""){
-     resultvalue = -resultvalue;
+
+getSign();
+
+// Handle equal sign click
+equals.addEventListener('click', () => {
+    if (firstValue !== "" && secondValue !== "") {
+        result.innerHTML = "";
+        switch (sign) {
+            case "+":
+                resultValue = +firstValue + +secondValue;
+                break;
+            case "-":
+                resultValue = +firstValue - +secondValue;
+                break;
+            case "*":
+                resultValue = +firstValue * +secondValue;
+                break;
+            case "/":
+                resultValue = +firstValue / +secondValue;
+                break;
+        }
+        result.innerHTML = resultValue;
+        firstValue = resultValue;
+        secondValue = "";
+        checkResultLength();
     }
-    result.innerHTML=resultvalue;
- })
+});
+
+function checkResultLength() {
+    resultValue = JSON.stringify(resultValue);
+    if (resultValue.length >= 8) {
+        resultValue = JSON.parse(resultValue);
+        result.innerHTML = resultValue.toFixed(5);
+    }
+}
+
+// Handle percent button
+percent.addEventListener('click', () => {
+    result.innerHTML = "";
+    if (firstValue !== "") {
+        resultValue = firstValue / 100;
+        firstValue = resultValue;
+    } else if (firstValue !== "" && secondValue !== "") {
+        resultValue = resultValue / 100;
+    }
+    result.innerHTML = resultValue;
+});
+
+// Handle clear button
+clearButton.addEventListener("click", () => {
+    firstValue = "";
+    isFirstValue = false;
+    secondValue = "";
+    isSecondValue = false;
+    sign = "";
+    resultValue = 0;
+    result.innerHTML = 0;
+});
+
+// Handle negative toggle button
+negativeButton.addEventListener('click', () => {
+    if (isFirstValue && secondValue !== "") {
+        secondValue = -secondValue;
+        result.innerHTML = secondValue;
+    } else if (firstValue !== "") {
+        firstValue = -firstValue;
+        result.innerHTML = firstValue;
+    }
+});
